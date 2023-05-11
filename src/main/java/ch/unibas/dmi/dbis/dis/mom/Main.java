@@ -20,24 +20,15 @@ public class Main {
         String entrypoint = args[0];
 
         switch (entrypoint) {
-            case "Distributor":
-                Distributor.main(args);
-                break;
-            case "DeepSeaProbe":
-                DeepSeaProbe.main(args);
-                break;
-            case "WeatherBalloon":
-                WeatherBalloon.main(args);
-                break;
-            case "TemperatureProcessor":
-                TemperatureProcessor.main(args);
-                break;
-            case "WeatherForecastAggregator":
-                WeatherForecastAggregator.main(args);
-                break;
-            default:
+            case "Distributor" -> Distributor.main(args);
+            case "DeepSeaProbe" -> DeepSeaProbe.main(args);
+            case "WeatherBalloon" -> WeatherBalloon.main(args);
+            case "TemperatureProcessor" -> TemperatureProcessor.main(args);
+            case "WeatherForecastAggregator" -> WeatherForecastAggregator.main(args);
+            default -> {
                 System.err.println("Unknown entrypoint: " + entrypoint);
                 System.exit(1);
+            }
         }
     }
 }

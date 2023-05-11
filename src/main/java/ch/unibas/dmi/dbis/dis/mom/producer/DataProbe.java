@@ -3,18 +3,22 @@ package ch.unibas.dmi.dbis.dis.mom.producer;
 import ch.unibas.dmi.dbis.dis.mom.aws.ClientProvider;
 import ch.unibas.dmi.dbis.dis.mom.data.DataContainer;
 import ch.unibas.dmi.dbis.dis.mom.queue.QueueManager;
-import com.amazonaws.services.sqs.AmazonSQS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import software.amazon.awssdk.services.sqs.SqsClient;
 
 /**
  * Abstract class containing shared functions of all data probes (data producers).
  */
 public abstract class DataProbe implements Runnable {
-    private final AmazonSQS sqsClient;
+
+    private static final Logger LOG = LoggerFactory.getLogger(DataProbe.class);
+    private final SqsClient sqsClient;
     private final String queueUrl;
 
     public boolean running = true;
 
-    public DataProbe() {
+    protected DataProbe() {
         sqsClient = ClientProvider.getSQSClient();
         queueUrl = QueueManager.getDataQueue(sqsClient);
     }
@@ -29,7 +33,7 @@ public abstract class DataProbe implements Runnable {
             while (running) {
                 Thread.sleep(getDataDelay());
                 DataContainer data = collectData();
-                System.out.println("Collected data: " + data);
+                LOG.info("Collected data: " + data);
                 sendData(data.toMessageString());
             }
         } catch (InterruptedException e) {

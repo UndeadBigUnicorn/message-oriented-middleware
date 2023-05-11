@@ -1,6 +1,6 @@
 package ch.unibas.dmi.dbis.dis.mom.queue;
 
-import com.amazonaws.services.sqs.AmazonSQS;
+import software.amazon.awssdk.services.sqs.SqsClient;
 
 /**
  * Collection of methods for SQS queue management.
@@ -16,7 +16,7 @@ public class QueueManager {
      *
      * @return SQS queue URL
      */
-    public static String getDataQueue(AmazonSQS sqs) {
+    public static String getDataQueue(SqsClient sqs) {
         // TODO: Implement
         return null;
     }
@@ -26,7 +26,7 @@ public class QueueManager {
      *
      * @return SQS queue URL
      */
-    public static String createQueue(AmazonSQS sqs, String queueName) {
+    public static String createQueue(SqsClient sqs, String queueName) {
         // TODO: Implement
         return null;
     }
@@ -34,7 +34,7 @@ public class QueueManager {
     /**
      * Deletes the SQS queue with the given URL.
      */
-    public static void deleteQueue(AmazonSQS sqs, String queueUrl) {
+    public static void deleteQueue(SqsClient sqs, String queueUrl) {
         // TODO: Implement
     }
 }

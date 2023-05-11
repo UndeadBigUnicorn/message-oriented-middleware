@@ -4,8 +4,8 @@ import ch.unibas.dmi.dbis.dis.mom.aws.ClientProvider;
 import ch.unibas.dmi.dbis.dis.mom.data.DataContainer;
 import ch.unibas.dmi.dbis.dis.mom.pubsub.PublishSubscribeManager;
 import ch.unibas.dmi.dbis.dis.mom.queue.QueueManager;
-import com.amazonaws.services.sns.AmazonSNS;
-import com.amazonaws.services.sqs.AmazonSQS;
+import software.amazon.awssdk.services.sns.SnsClient;
+import software.amazon.awssdk.services.sqs.SqsClient;
 
 import java.util.Scanner;
 
@@ -15,9 +15,9 @@ import java.util.Scanner;
  * Note that the sqsClient is only required if you use SQS queues as SNS subscription targets.
  */
 public abstract class FeatureProcessor implements Runnable {
-    private final AmazonSQS sqsClient;
+    private final SqsClient sqsClient;
     private final String queueUrl;
-    private final AmazonSNS snsClient;
+    private final SnsClient snsClient;
     private final String[] subscriptionArns;
 
     public boolean running = true;

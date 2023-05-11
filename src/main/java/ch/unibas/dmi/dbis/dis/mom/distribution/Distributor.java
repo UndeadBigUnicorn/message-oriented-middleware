@@ -3,8 +3,8 @@ package ch.unibas.dmi.dbis.dis.mom.distribution;
 import ch.unibas.dmi.dbis.dis.mom.aws.ClientProvider;
 import ch.unibas.dmi.dbis.dis.mom.data.DataContainer;
 import ch.unibas.dmi.dbis.dis.mom.queue.QueueManager;
-import com.amazonaws.services.sns.AmazonSNS;
-import com.amazonaws.services.sqs.AmazonSQS;
+import software.amazon.awssdk.services.sns.SnsClient;
+import software.amazon.awssdk.services.sqs.SqsClient;
 
 import java.util.Scanner;
 
@@ -13,8 +13,8 @@ import java.util.Scanner;
  */
 public class Distributor implements Runnable {
     private final String queueUrl;
-    private final AmazonSQS sqsClient;
-    private final AmazonSNS snsClient;
+    private final SqsClient sqsClient;
+    private final SnsClient snsClient;
 
     public boolean running = true;
 

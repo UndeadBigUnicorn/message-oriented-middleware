@@ -1,7 +1,7 @@
 package ch.unibas.dmi.dbis.dis.mom.pubsub;
 
-import com.amazonaws.services.sns.AmazonSNS;
-import com.amazonaws.services.sqs.AmazonSQS;
+import software.amazon.awssdk.services.sns.SnsClient;
+import software.amazon.awssdk.services.sqs.SqsClient;
 
 /**
  * Collection of methods to manage SNS topics and subscriptions.
@@ -13,7 +13,7 @@ public class PublishSubscribeManager {
      *
      * @return SNS Topic ARN
      */
-    public static String getTopic(AmazonSNS snsClient, String topicName) {
+    public static String getTopic(SnsClient snsClient, String topicName) {
         // TODO: Implement
         return null;
     }
@@ -23,7 +23,7 @@ public class PublishSubscribeManager {
      * <p>
      * Depending on your implementation, you may never need to use this method.
      */
-    public static void deleteTopic(AmazonSNS snsClient, String topicArn) {
+    public static void deleteTopic(SnsClient snsClient, String topicArn) {
         // TODO: Implement
     }
 
@@ -37,7 +37,7 @@ public class PublishSubscribeManager {
      * @param queueUrl URL of the SQS queue to subscribe to the topics
      * @return SNS subscription ARNs corresponding to the topic subscriptions
      */
-    public static String[] subscribeToTopics(AmazonSNS snsClient, AmazonSQS sqsClient, String[] topics, String queueUrl) {
+    public static String[] subscribeToTopics(SnsClient snsClient, SqsClient sqsClient, String[] topics, String queueUrl) {
         // TODO: Implement
         return null;
     }
@@ -45,7 +45,7 @@ public class PublishSubscribeManager {
     /**
      * Deletes the subscriptions corresponding with the given subscription ARNs.
      */
-    public static void unsubscribeFromTopics(AmazonSNS snsClient, String[] subscriptionArns) {
+    public static void unsubscribeFromTopics(SnsClient snsClient, String[] subscriptionArns) {
         // TODO: Implement
     }
 }

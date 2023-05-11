@@ -36,7 +36,9 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.9.0'
     // AWS SDK
-    implementation 'com.amazonaws:aws-java-sdk:1.12.465'
+//    implementation 'software.amazon.awssdk:aws-sdk-java:2.20.63'
+    implementation 'software.amazon.awssdk:sns:2.20.63'
+    implementation 'software.amazon.awssdk:sqs:2.20.63'
     // JSON
     implementation 'com.google.code.gson:gson:2.10.1'
 }

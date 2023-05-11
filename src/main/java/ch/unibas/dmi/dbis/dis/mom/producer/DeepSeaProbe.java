@@ -2,6 +2,8 @@ package ch.unibas.dmi.dbis.dis.mom.producer;
 
 import ch.unibas.dmi.dbis.dis.mom.data.DataContainer;
 import ch.unibas.dmi.dbis.dis.mom.data.TemperatureData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 import java.util.Scanner;
@@ -11,6 +13,8 @@ import java.util.Scanner;
  */
 public class DeepSeaProbe extends DataProbe {
     private final Random random = new Random();
+
+    private static final Logger LOG = LoggerFactory.getLogger(DeepSeaProbe.class);
 
     @Override
     protected DataContainer collectData() {
@@ -25,13 +29,14 @@ public class DeepSeaProbe extends DataProbe {
     }
 
     public static void main(String[] args) {
+        LOG.info("Greetings from deep sea bottom!");
         DeepSeaProbe probe = new DeepSeaProbe();
 
         Thread thread = new Thread(probe);
         thread.start();
 
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Press enter to exit.");
+        LOG.info("Press enter to exit.");
         scanner.nextLine();
         probe.running = false;
     }

@@ -7,11 +7,17 @@ import ch.unibas.dmi.dbis.dis.mom.data.TemperatureData;
 import java.util.Random;
 import java.util.Scanner;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Very basic data probe collecting temperature and pressure data.
  */
 public class WeatherBalloon extends DataProbe {
+
     private final Random random = new Random();
+
+    private static final Logger LOG = LoggerFactory.getLogger(WeatherBalloon.class);
 
     @Override
     protected DataContainer collectData() {
@@ -31,13 +37,14 @@ public class WeatherBalloon extends DataProbe {
     }
 
     public static void main(String[] args) {
+        LOG.info("Greetings from weather balloon. \n F-22, please don't shoot me!");
         WeatherBalloon probe = new WeatherBalloon();
 
         Thread thread = new Thread(probe);
         thread.start();
 
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Press enter to exit.");
+        LOG.info("Press enter to exit.");
         scanner.nextLine();
         probe.running = false;
     }
