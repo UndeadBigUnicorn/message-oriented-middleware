@@ -31,10 +31,11 @@ public final class ClientProvider {
         if (sqsClient != null) {
             return sqsClient;
         }
-        return SqsClient.builder()
+        sqsClient = SqsClient.builder()
                 .region(region)
                 .credentialsProvider(DefaultCredentialsProvider.create())
                 .build();
+        return sqsClient;
     }
 
     /**
@@ -44,9 +45,10 @@ public final class ClientProvider {
         if (snsClient != null) {
             return snsClient;
         }
-        return SnsClient.builder()
+        snsClient = SnsClient.builder()
                 .region(region)
                 .credentialsProvider(DefaultCredentialsProvider.create())
                 .build();
+        return snsClient;
     }
 }

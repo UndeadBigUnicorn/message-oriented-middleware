@@ -30,11 +30,18 @@ application {
     mainClass = 'ch.unibas.dmi.dbis.dis.mom.Main'
 }
 
+run {
+    standardInput = System.in
+}
+
 dependencies {
     // JUnit add-ons
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.9.0'
+    // LOG
+    implementation 'org.slf4j:slf4j-api:2.0.7'
+    implementation 'org.slf4j:slf4j-simple:2.0.7'
     // AWS SDK
 //    implementation 'software.amazon.awssdk:aws-sdk-java:2.20.63'
     implementation 'software.amazon.awssdk:sns:2.20.63'

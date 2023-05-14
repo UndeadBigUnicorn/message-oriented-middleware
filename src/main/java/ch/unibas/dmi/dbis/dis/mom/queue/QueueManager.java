@@ -1,40 +1,68 @@
 package ch.unibas.dmi.dbis.dis.mom.queue;
 
 import software.amazon.awssdk.services.sqs.SqsClient;
+import software.amazon.awssdk.services.sqs.model.*;
 
-/**
- * Collection of methods for SQS queue management.
- */
+/** Collection of methods for SQS queue management. */
 public class QueueManager {
-    /**
-     * Name of the SQS data queue.
-     */
-    public static final String QUEUE_NAME = "DataQueue";
+  /** Name of the SQS data queue. */
+  public static final String QUEUE_NAME = "DataProbes.fifo";
+
+  /**
+   * Returns the SQS data queue URL if it exists, otherwise creates the queue.
+   *
+   * @return SQS queue URL
+   */
+  public static String getDataQueue(final SqsClient sqsClient) {
+    try {
+        return getDataQueueUrl(sqsClient, QUEUE_NAME);
+    } catch (QueueDoesNotExistException e) {
+      return createQueue(sqsClient, QUEUE_NAME);
+    }
+  }
+
+  /**
+   * Creates a new SQS queue with the given name.
+   *
+   * @return SQS queue URL
+   */
+  public static String createQueue(final SqsClient sqsClient, String queueName) {
+      try {
+          CreateQueueRequest createQueueRequest =
+                  CreateQueueRequest.builder().queueName(queueName).build();
+
+          sqsClient.createQueue(createQueueRequest);
+
+          return getDataQueueUrl(sqsClient, queueName);
+      } catch (SqsException e) {
+          System.err.println(e.awsErrorDetails().errorMessage());
+          System.exit(1);
+      }
+      return "";
+  }
 
     /**
-     * Returns the SQS data queue URL if it exists, otherwise creates the queue.
+     * Retrieve a data queue url.
      *
      * @return SQS queue URL
      */
-    public static String getDataQueue(SqsClient sqs) {
-        // TODO: Implement
-        return null;
-    }
+  private static String getDataQueueUrl(final SqsClient sqsClient, String queueName) {
+      GetQueueUrlResponse getQueueUrlResponse =
+              sqsClient.getQueueUrl(GetQueueUrlRequest.builder().queueName(queueName).build());
+      return getQueueUrlResponse.queueUrl();
+  }
 
-    /**
-     * Creates a new SQS queue with the given name.
-     *
-     * @return SQS queue URL
-     */
-    public static String createQueue(SqsClient sqs, String queueName) {
-        // TODO: Implement
-        return null;
-    }
+  /** Deletes the SQS queue with the given URL. */
+  public static void deleteQueue(SqsClient sqsClient, String queueUrl) {
+    try {
+        DeleteQueueRequest deleteQueueRequest = DeleteQueueRequest.builder()
+                .queueUrl(queueUrl)
+                .build();
 
-    /**
-     * Deletes the SQS queue with the given URL.
-     */
-    public static void deleteQueue(SqsClient sqs, String queueUrl) {
-        // TODO: Implement
+        sqsClient.deleteQueue(deleteQueueRequest);
+    } catch (SqsException e) {
+        System.err.println(e.awsErrorDetails().errorMessage());
+        System.exit(1);
     }
+  }
 }

@@ -35,8 +35,8 @@ public class DeepSeaProbe extends DataProbe {
         Thread thread = new Thread(probe);
         thread.start();
 
-        Scanner scanner = new Scanner(System.in);
         LOG.info("Press enter to exit.");
+        Scanner scanner = new Scanner(System.in);
         scanner.nextLine();
         probe.running = false;
     }
