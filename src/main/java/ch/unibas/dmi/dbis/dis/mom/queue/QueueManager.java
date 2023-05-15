@@ -3,6 +3,8 @@ package ch.unibas.dmi.dbis.dis.mom.queue;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.*;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 /** Collection of methods for SQS queue management. */
@@ -30,11 +32,7 @@ public class QueueManager {
    */
   public static String createQueue(final SqsClient sqsClient, String queueName) {
     try {
-      CreateQueueRequest createQueueRequest =
-          CreateQueueRequest.builder().queueName(queueName).build();
-
-      sqsClient.createQueue(createQueueRequest);
-
+      sqsClient.createQueue(request -> request.queueName(queueName));
       return getDataQueueUrl(sqsClient, queueName);
     } catch (SqsException e) {
       System.err.println(e.awsErrorDetails().errorMessage());
@@ -49,18 +47,13 @@ public class QueueManager {
    * @return SQS queue URL
    */
   private static String getDataQueueUrl(final SqsClient sqsClient, String queueName) {
-    GetQueueUrlResponse getQueueUrlResponse =
-        sqsClient.getQueueUrl(GetQueueUrlRequest.builder().queueName(queueName).build());
-    return getQueueUrlResponse.queueUrl();
+    return sqsClient.getQueueUrl(request -> request.queueName(queueName)).queueUrl();
   }
 
   /** Deletes the SQS queue with the given URL. */
   public static void deleteQueue(SqsClient sqsClient, String queueUrl) {
     try {
-      DeleteQueueRequest deleteQueueRequest =
-          DeleteQueueRequest.builder().queueUrl(queueUrl).build();
-
-      sqsClient.deleteQueue(deleteQueueRequest);
+      sqsClient.deleteQueue(request -> request.queueUrl(queueUrl));
     } catch (SqsException e) {
       System.err.println(e.awsErrorDetails().errorMessage());
       System.exit(1);
@@ -75,18 +68,40 @@ public class QueueManager {
       final String messageGroup) {
     try {
       String id = UUID.randomUUID().toString();
-      SendMessageBatchRequest sendMessageBatchRequest =
-          SendMessageBatchRequest.builder()
-              .queueUrl(queueUrl)
-              .entries(
-                  SendMessageBatchRequestEntry.builder()
-                      .id(id)
-                      .messageBody(message)
-                      .messageGroupId(messageGroup)
-                      .messageDeduplicationId(id)
-                      .build())
-              .build();
-      sqsClient.sendMessageBatch(sendMessageBatchRequest);
+      sqsClient.sendMessageBatch(
+          request ->
+              request
+                  .queueUrl(queueUrl)
+                  .entries(
+                      SendMessageBatchRequestEntry.builder()
+                          .id(id)
+                          .messageBody(message)
+                          .messageGroupId(messageGroup)
+                          .messageDeduplicationId(id)
+                          .build()));
+    } catch (SqsException e) {
+      System.err.println(e.awsErrorDetails().errorMessage());
+      System.exit(1);
+    }
+  }
+
+  /** Receive messages from the queue. */
+  public static List<Message> receiveMessages(final SqsClient sqsClient, final String queueUrl) {
+    try {
+      return sqsClient.receiveMessage(request -> request.queueUrl(queueUrl)).messages();
+    } catch (SqsException e) {
+      System.err.println(e.awsErrorDetails().errorMessage());
+      System.exit(1);
+    }
+    return Collections.emptyList();
+  }
+
+  /** Delete the message from the queue. */
+  public static void deleteMessage(
+      final SqsClient sqsClient, final String queueUrl, final Message message) {
+    try {
+      sqsClient.deleteMessage(
+          request -> request.queueUrl(queueUrl).receiptHandle(message.receiptHandle()));
     } catch (SqsException e) {
       System.err.println(e.awsErrorDetails().errorMessage());
       System.exit(1);

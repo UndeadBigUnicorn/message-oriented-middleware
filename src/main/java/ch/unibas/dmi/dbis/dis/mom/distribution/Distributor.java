@@ -3,15 +3,21 @@ package ch.unibas.dmi.dbis.dis.mom.distribution;
 import ch.unibas.dmi.dbis.dis.mom.aws.ClientProvider;
 import ch.unibas.dmi.dbis.dis.mom.data.DataContainer;
 import ch.unibas.dmi.dbis.dis.mom.queue.QueueManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.sns.SnsClient;
 import software.amazon.awssdk.services.sqs.SqsClient;
+import software.amazon.awssdk.services.sqs.model.Message;
 
+import java.util.List;
 import java.util.Scanner;
 
 /**
  * Middleware component responsible for collecting probe data and redistributing through publish-subscribe.
  */
 public class Distributor implements Runnable {
+
+    private static final Logger LOG = LoggerFactory.getLogger(Distributor.class);
     private final String queueUrl;
     private final SqsClient sqsClient;
     private final SnsClient snsClient;
@@ -22,6 +28,22 @@ public class Distributor implements Runnable {
         sqsClient = ClientProvider.getSQSClient();
         queueUrl = QueueManager.getDataQueue(sqsClient);
         snsClient = ClientProvider.getSNSClient();
+    }
+
+    /**
+     * Run this main method to start a distributor from within your IDE.
+     */
+    public static void main(String[] args) {
+        LOG.info("Welcome from the distributor!\nI'm waiting for messages and I'm ready to dispatch them!");
+        Distributor distributor = new Distributor();
+
+        Thread thread = new Thread(distributor);
+        thread.start();
+
+        LOG.info("Press enter to exit.");
+        Scanner scanner = new Scanner(System.in);
+        scanner.nextLine();
+        distributor.running = false;
     }
 
     /**
@@ -36,6 +58,8 @@ public class Distributor implements Runnable {
                 Thread.sleep(250);
                 receiveMessages();
             }
+            // close the client at the end
+            sqsClient.close();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -47,7 +71,16 @@ public class Distributor implements Runnable {
      * returns true).
      */
     private void receiveMessages() {
-        // TODO: Implement
+        QueueManager.receiveMessages(sqsClient, queueUrl)
+                .forEach(message -> {
+                    DataContainer data = DataContainer.parseMessageString(message.body());
+                    // check if the `publish` was successful
+                    // and delete the message from the queue afterward
+                    if (publish(data)) {
+                        LOG.debug("Deleting the message: " + message.messageId());
+                        QueueManager.deleteMessage(sqsClient, queueUrl, message);
+                    }
+                });
     }
 
     /**
@@ -63,23 +96,8 @@ public class Distributor implements Runnable {
     private boolean publish(DataContainer data) {
         // TODO: Implement
         // To test the first task of the exercise, you can leave this part as it is.
-        System.out.println(data);
+        LOG.info(data.toString());
 
         return true;
-    }
-
-    /**
-     * Run this main method to start a distributor from within your IDE.
-     */
-    public static void main(String[] args) {
-        Distributor distributor = new Distributor();
-
-        Thread thread = new Thread(distributor);
-        thread.start();
-
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Press enter to exit.");
-        scanner.nextLine();
-        distributor.running = false;
     }
 }

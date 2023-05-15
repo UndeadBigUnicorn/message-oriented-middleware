@@ -34,6 +34,8 @@ public abstract class DataProbe implements Runnable {
         LOG.info("Collected data: " + data);
         sendData(data.toMessageString(), data.getType());
       }
+      // close the client
+      sqsClient.close();
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
