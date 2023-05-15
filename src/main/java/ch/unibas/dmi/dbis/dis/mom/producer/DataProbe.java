@@ -32,7 +32,7 @@ public abstract class DataProbe implements Runnable {
         Thread.sleep(getDataDelay());
         DataContainer data = collectData();
         LOG.info("Collected data: " + data);
-        sendData(data.toMessageString(), data.getType());
+        sendData(data.toMessageString());
       }
       // close the client
       sqsClient.close();
@@ -45,10 +45,9 @@ public abstract class DataProbe implements Runnable {
    * Sends the data to the data queue.
    *
    * @param message DataContainer message string.
-   * @param messageGroup DataContainer type.
    */
-  protected void sendData(final String message, final String messageGroup) {
-    QueueManager.sendMessage(sqsClient, queueUrl, message, messageGroup);
+  protected void sendData(final String message) {
+    QueueManager.sendMessage(sqsClient, queueUrl, message);
   }
 
   /**

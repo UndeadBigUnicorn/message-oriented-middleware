@@ -32,10 +32,6 @@ public class QueueManager {
   public static String createQueue(final SqsClient sqsClient, String queueName) {
     try {
       sqsClient.createQueue(request -> request.queueName(queueName));
-      //                  .attributes(
-      //                      Map.of(
-      //                          QueueAttributeName.FIFO_QUEUE, "true",
-      //                          QueueAttributeName.CONTENT_BASED_DEDUPLICATION, "true")));
       return getDataQueueUrl(sqsClient, queueName);
     } catch (SqsException e) {
       System.err.println(e.awsErrorDetails().errorMessage());
@@ -65,10 +61,7 @@ public class QueueManager {
 
   /** Send messages into the queue. */
   public static void sendMessage(
-      final SqsClient sqsClient,
-      final String queueUrl,
-      final String message,
-      final String messageGroup) {
+      final SqsClient sqsClient, final String queueUrl, final String message) {
     try {
       String id = UUID.randomUUID().toString();
       sqsClient.sendMessageBatch(
@@ -76,12 +69,7 @@ public class QueueManager {
               request
                   .queueUrl(queueUrl)
                   .entries(
-                      SendMessageBatchRequestEntry.builder()
-                          .id(id)
-                          .messageBody(message)
-                          //                          .messageGroupId(messageGroup)
-                          //                          .messageDeduplicationId(id)
-                          .build()));
+                      SendMessageBatchRequestEntry.builder().id(id).messageBody(message).build()));
     } catch (SqsException e) {
       System.err.println(e.awsErrorDetails().errorMessage());
       System.exit(1);
