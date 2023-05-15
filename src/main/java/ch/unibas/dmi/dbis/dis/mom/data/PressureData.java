@@ -16,6 +16,11 @@ public class PressureData implements DataContainer {
         this.time = time;
     }
 
+    public static PressureData fromMessageString(String data) {
+        String[] parts = data.split(DELIMITER);
+        return new PressureData(Float.parseFloat(parts[1]), parts[2], Long.parseLong(parts[3]));
+    }
+
     @Override
     public String toString() {
         String dateString = DataContainer.formatTime(time);
@@ -30,10 +35,5 @@ public class PressureData implements DataContainer {
     @Override
     public String getType() {
         return TYPE;
-    }
-
-    public static PressureData fromMessageString(String data) {
-        String[] parts = data.split(DELIMITER);
-        return new PressureData(Float.parseFloat(parts[1]), parts[2], Long.parseLong(parts[3]));
     }
 }

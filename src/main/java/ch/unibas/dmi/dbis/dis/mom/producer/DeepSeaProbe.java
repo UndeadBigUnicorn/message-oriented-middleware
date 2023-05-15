@@ -12,21 +12,8 @@ import java.util.Scanner;
  * Very basic data probe collecting temperature data.
  */
 public class DeepSeaProbe extends DataProbe {
-    private final Random random = new Random();
-
     private static final Logger LOG = LoggerFactory.getLogger(DeepSeaProbe.class);
-
-    @Override
-    protected DataContainer collectData() {
-        float temp = random.nextFloat() * 3 + 0.5f;
-        long time = System.currentTimeMillis();
-        return new TemperatureData(temp, "Deep Sea", time);
-    }
-
-    @Override
-    protected int getDataDelay() {
-        return random.nextInt(5000) + 100;
-    }
+    private final Random random = new Random();
 
     public static void main(String[] args) {
         LOG.info("Greetings from deep sea bottom!");
@@ -39,5 +26,17 @@ public class DeepSeaProbe extends DataProbe {
         Scanner scanner = new Scanner(System.in);
         scanner.nextLine();
         probe.running = false;
+    }
+
+    @Override
+    protected DataContainer collectData() {
+        float temp = random.nextFloat() * 3 + 0.5f;
+        long time = System.currentTimeMillis();
+        return new TemperatureData(temp, "Deep Sea", time);
+    }
+
+    @Override
+    protected int getDataDelay() {
+        return random.nextInt(5000) + 100;
     }
 }

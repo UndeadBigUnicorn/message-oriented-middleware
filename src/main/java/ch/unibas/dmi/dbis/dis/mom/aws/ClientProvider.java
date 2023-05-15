@@ -10,9 +10,7 @@ import software.amazon.awssdk.regions.Region;
  */
 public final class ClientProvider {
 
-    // hide public constructor
-    private ClientProvider() {}
-
+    private static final Region region = Region.US_EAST_1;
     /*
      * Singletons:
      * Reuse clients since each instance instance of client
@@ -23,7 +21,9 @@ public final class ClientProvider {
     // pub/sub
     private static SnsClient snsClient;
 
-    private static final Region region = Region.US_EAST_1;
+    // hide public constructor
+    private ClientProvider() {}
+
     /**
      * @return Amazon SQS client to interact with AWS SQS queues.
      */
