@@ -14,8 +14,16 @@ import org.slf4j.LoggerFactory;
  */
 public class WeatherForecastAggregator extends FeatureProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(WeatherForecastAggregator.class);
+  private static final String LOCATION_OF_INTEREST = "Stratosphere";
+  private static final int LOWER_TEMPERATURE_BOUND = -30;
+  private static final int UPPER_TEMPERATURE_BOUND = 20;
   private float rollingAverageTemp;
   private float rollingAveragePressure;
+
+  /** Apply content based subscription. */
+  public WeatherForecastAggregator() {
+    super(LOCATION_OF_INTEREST, LOWER_TEMPERATURE_BOUND, UPPER_TEMPERATURE_BOUND);
+  }
 
   public static void main(String[] args) {
     runProcessor(new WeatherForecastAggregator());

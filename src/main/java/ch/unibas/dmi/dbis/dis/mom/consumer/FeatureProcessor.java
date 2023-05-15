@@ -41,6 +41,19 @@ public abstract class FeatureProcessor implements Runnable {
   }
 
   /**
+   * Apply content based filter
+   *
+   * @param location of interest
+   * @param lowerTemperatureBound to look for
+   * @param upperTemperatureBound to look for
+   */
+  public FeatureProcessor(String location, int lowerTemperatureBound, int upperTemperatureBound) {
+    this();
+    PublishSubscribeManager.contentBasedFilterSubscription(
+        snsClient, subscriptionArns, location, lowerTemperatureBound, upperTemperatureBound);
+  }
+
+  /**
    * Convenience method for all feature processors to call in their main method to reduce code
    * duplication.
    */
@@ -92,9 +105,9 @@ public abstract class FeatureProcessor implements Runnable {
               String messageText = null;
               try {
                 // Parse the message body JSON string to extract the actual message text
-                TypeToken<Map<String, String>> mapType = new TypeToken<>() {};
-                Map<String, String> messageBodyJson = new Gson().fromJson(message.body(), mapType);
-                messageText = messageBodyJson.get("Message");
+                TypeToken<Map<String, Object>> mapType = new TypeToken<>() {};
+                Map<String, Object> messageBodyJson = new Gson().fromJson(message.body(), mapType);
+                messageText = messageBodyJson.get("Message").toString();
               } catch (Exception e) {
                 LOG.error("Failed to extract message text from SQS message: " + e.getMessage());
                 return;

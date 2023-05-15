@@ -24,7 +24,7 @@ public class PublishSubscribeManager {
           + "      \"Resource\": \"%s\",\n"
           + "      \"Condition\": {\n"
           + "        \"ArnEquals\": {\n"
-          + "          \"aws:SourceArn\": \"%s\"\n"
+          + "          \"aws:SourceArn\": [%s]\n"
           + "        }\n"
           + "      }\n"
           + "    }\n"
@@ -81,26 +81,57 @@ public class PublishSubscribeManager {
               .attributes()
               .get(arnQueueAttribute);
       List<String> subscriptions = new ArrayList<>();
+      List<String> topicArns = new ArrayList<>();
       for (String topic : topics) {
         String topicArn = getTopic(snsClient, topic);
+        topicArns.add("\"" + topicArn + "\"");
         // subscribe to the topic
         subscriptions.add(
             snsClient
                 .subscribe(
                     request -> request.topicArn(topicArn).protocol("sqs").endpoint(sqsQueueArn))
                 .subscriptionArn());
-        // allow topic to send messages to the queue
-        String policy = String.format(QUEUE_POLICY_TEMPLATE, sqsQueueArn, topicArn);
-        sqsClient.setQueueAttributes(
-            request ->
-                request.queueUrl(queueUrl).attributes(Map.of(QueueAttributeName.POLICY, policy)));
       }
+      // allow topic to send messages to the queue
+      String policy =
+          String.format(QUEUE_POLICY_TEMPLATE, sqsQueueArn, String.join(",", topicArns));
+      sqsClient.setQueueAttributes(
+          request ->
+              request.queueUrl(queueUrl).attributes(Map.of(QueueAttributeName.POLICY, policy)));
       return subscriptions.toArray(new String[0]);
     } catch (SnsException e) {
       System.err.println(e.awsErrorDetails().errorMessage());
       System.exit(1);
     }
     return new String[0];
+  }
+
+  /**
+   * Content based subscription filters.
+   *
+   * @param subscriptionArns Array of subscription arns to filter
+   */
+  public static void contentBasedFilterSubscription(
+      SnsClient snsClient,
+      String[] subscriptionArns,
+      final String location,
+      final int lowerTemperatureBound,
+      final int upperTemperatureBound) {
+    try {
+      for (String subscriptionArn : subscriptionArns) {
+        SNSMessageFilterPolicy fp = new SNSMessageFilterPolicy();
+        // Add a filter policy attribute with a single value
+        fp.addAttribute("Location", location);
+        // Add a numeric attribute with a range
+        fp.addAttributeRange(
+            "Temperature", ">", lowerTemperatureBound, "<=", upperTemperatureBound);
+        // Apply the filter policy attributes to an Amazon SNS subscription
+        fp.apply(snsClient, subscriptionArn);
+      }
+    } catch (SnsException e) {
+      System.err.println(e.awsErrorDetails().errorMessage());
+      System.exit(1);
+    }
   }
 
   /** Deletes the subscriptions corresponding with the given subscription ARNs. */

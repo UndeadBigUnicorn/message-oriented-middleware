@@ -2,12 +2,16 @@ package ch.unibas.dmi.dbis.dis.mom.distribution;
 
 import ch.unibas.dmi.dbis.dis.mom.aws.ClientProvider;
 import ch.unibas.dmi.dbis.dis.mom.data.DataContainer;
+import ch.unibas.dmi.dbis.dis.mom.data.TemperatureData;
 import ch.unibas.dmi.dbis.dis.mom.pubsub.PublishSubscribeManager;
 import ch.unibas.dmi.dbis.dis.mom.queue.QueueManager;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.sns.SnsClient;
+import software.amazon.awssdk.services.sns.model.MessageAttributeValue;
 import software.amazon.awssdk.services.sns.model.PublishResponse;
 import software.amazon.awssdk.services.sqs.SqsClient;
 
@@ -98,8 +102,28 @@ public class Distributor implements Runnable {
   private boolean publish(DataContainer data) {
     LOG.info(data.toString());
     String topicArn = PublishSubscribeManager.getTopic(snsClient, data.getType());
+    Map<String, MessageAttributeValue> messageAttributes = new HashMap<>();
+    if (data instanceof TemperatureData temperatureData) {
+      messageAttributes.put(
+          "Location",
+          MessageAttributeValue.builder()
+              .dataType("String")
+              .stringValue(temperatureData.location)
+              .build());
+      messageAttributes.put(
+          "Temperature",
+          MessageAttributeValue.builder()
+              .dataType("Number")
+              .stringValue(Float.toString(temperatureData.temperature))
+              .build());
+    }
     PublishResponse response =
-        snsClient.publish(request -> request.topicArn(topicArn).message(data.toMessageString()));
+        snsClient.publish(
+            request ->
+                request
+                    .topicArn(topicArn)
+                    .message(data.toMessageString())
+                    .messageAttributes(messageAttributes));
     return response.sdkHttpResponse().isSuccessful();
   }
 }
