@@ -1,16 +1,15 @@
 package ch.unibas.dmi.dbis.dis.mom.queue;
 
-import software.amazon.awssdk.services.sqs.SqsClient;
-import software.amazon.awssdk.services.sqs.model.*;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import software.amazon.awssdk.services.sqs.SqsClient;
+import software.amazon.awssdk.services.sqs.model.*;
 
 /** Collection of methods for SQS queue management. */
 public class QueueManager {
   /** Name of the SQS data queue. */
-  public static final String QUEUE_NAME = "DataProbes.fifo";
+  public static final String QUEUE_NAME = "DataProbes";
 
   /**
    * Returns the SQS data queue URL if it exists, otherwise creates the queue.
@@ -33,6 +32,10 @@ public class QueueManager {
   public static String createQueue(final SqsClient sqsClient, String queueName) {
     try {
       sqsClient.createQueue(request -> request.queueName(queueName));
+      //                  .attributes(
+      //                      Map.of(
+      //                          QueueAttributeName.FIFO_QUEUE, "true",
+      //                          QueueAttributeName.CONTENT_BASED_DEDUPLICATION, "true")));
       return getDataQueueUrl(sqsClient, queueName);
     } catch (SqsException e) {
       System.err.println(e.awsErrorDetails().errorMessage());
@@ -76,8 +79,8 @@ public class QueueManager {
                       SendMessageBatchRequestEntry.builder()
                           .id(id)
                           .messageBody(message)
-                          .messageGroupId(messageGroup)
-                          .messageDeduplicationId(id)
+                          //                          .messageGroupId(messageGroup)
+                          //                          .messageDeduplicationId(id)
                           .build()));
     } catch (SqsException e) {
       System.err.println(e.awsErrorDetails().errorMessage());
